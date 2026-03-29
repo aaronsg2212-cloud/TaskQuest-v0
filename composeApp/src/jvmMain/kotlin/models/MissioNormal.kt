@@ -1,14 +1,12 @@
 package models
 
-class MissioEspecial(
+class MissioNormal(
     id: String,
     titol: String,
     dificultat: Int,
     estadisticaAfectada: String
 ) : Tasca(id, titol, dificultat, estadisticaAfectada) {
-
-    val recompensaXP: Int = dificultat * 50
-    override fun calcularXP(): Int {
-        return dificultat * 20 + recompensaXP
+    override fun calcularXP():Int{
+        return dificultat * 10
     }
 }
