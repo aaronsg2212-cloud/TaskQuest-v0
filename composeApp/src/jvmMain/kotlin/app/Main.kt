@@ -42,7 +42,8 @@ fun menuUsuari(gestor: GestorUsuaris) {
     println("4. Eliminar tasca")
     println("5. Eliminar usuari")
     println("6. Tancar Sessió")
-    println("7. Sortir")
+    println("7. Filtrar per dificultat")
+    println("8. Sortir")
     print("Escull una opció: ")
 
     when (readLine()) {
@@ -52,7 +53,8 @@ fun menuUsuari(gestor: GestorUsuaris) {
         "4" -> eliminarTasca(usuari)
         "5" -> gestor.eliminarUsuari()
         "6" -> gestor.canviarUsuari()
-        "7" -> {
+        "7" -> filtrarTasques(usuari)
+        "8" -> {
             println("Fins aviat!")
             System.exit(0)
         }
@@ -61,19 +63,21 @@ fun menuUsuari(gestor: GestorUsuaris) {
 }
 
 fun crearUsuari(gestor: GestorUsuaris) {
-    print("ID: ")
-    val id = readLine()!!
-    print("Nom: ")
-    val nom = readLine()!!
+//funcions a utils pera demanar els ids i els noms per a evitar redundancia de codi
+    println("ID usuari:")
+    val id = Utils.demanarId()
+    println("Nom usuari:")
+    val nom = Utils.demanarINoms()
+
     gestor.crearUsuari(id, nom)
-    println("Usuari creat!")
 }
 
 fun iniciarSessio(gestor: GestorUsuaris) {
-    print("ID: ")
-    val id = readLine()!!
-    print("Nom: ")
-    val nom = readLine()!!
+    println("===INICI DE SESSIÓ===")
+    println("Id usuari:")
+    val id = Utils.demanarId()
+    println("Nom usuari:")
+    val nom = Utils.demanarINoms()
     gestor.iniciarSessio(id, nom)
 }
 
@@ -83,28 +87,28 @@ fun afegirTasca(usuari: Usuari) {
     println("2. Diària")
     println("3. Especial")
     print("Escull: ")
-    val tipus = readLine()
+    val tipus = readLine()!!.trim()
 
-    print("ID: ")
-    val id = readLine()!!
-    print("Títol: ")
-    val titol = readLine()!!
-    print("Dificultat (1-10): ")
-    val dificultat = readLine()!!.toInt()
+    println("ID tasca:")
+    val id = Utils.demanarId()
+    println("Titol de la tasca:")
+    val titol = Utils.demanarINoms()
+
+    var dificultat: Int
+    do {
+        print("Dificultat (1-10): ")
+        dificultat = readLine()!!.toInt()
+        if (dificultat !in 1..10) println("La dificultat no pot ser mes gran que 10 ni menor que 1")
+    }while (dificultat !in 1..10)
+
     println("Estadístiques disponibles: ${usuari.estadistiques.map { it.nom }.joinToString(", ")}")
     print("Estadística afectada: ")
-    val estadistica = readLine()!!
+    val estadistica = readLine()!!.trim()
 
-    val tasca = when (tipus) {
-        "1" -> MissioNormal(id, titol, dificultat, estadistica)
-        "2" -> MissioDiaria(id, titol, dificultat, estadistica)
-        "3" -> MissioEspecial(id, titol, dificultat, estadistica)
-        else -> null
-    }
+    val tasca = Tasca.crear(tipus, id, titol, dificultat, estadistica)
 
     if (tasca != null) {
         usuari.afegirTasca(tasca)
-        println("Tasca afegida!")
     } else {
         println("Tipus no vàlid.")
     }
@@ -117,7 +121,7 @@ fun completarTasca(usuari: Usuari) {
     }
     Utils.mostrarTasques(usuari)
     print("ID de la tasca: ")
-    val id = readLine()!!
+    val id = Utils.demanarId()
     usuari.completarTasca(id)
 }
 
@@ -128,6 +132,16 @@ fun eliminarTasca(usuari: Usuari) {
     }
     Utils.mostrarTasques(usuari)
     print("ID de la tasca a eliminar: ")
-    val id = readLine()!!
+    val id = Utils.demanarId()
     usuari.eliminarTasca(id)
+}
+//funició per a fultrar tasques per dificultat mitjançant rangs.
+
+fun filtrarTasques(usuari: Usuari) {
+    println("\n1. Fàcil (1-3)")
+    println("2. Mitjà (4-6)")
+    println("3. Difícil (7-10)")
+    print("Escull: ")
+    val rang = readLine()!!
+    usuari.filtrarPerDificultat(rang)
 }

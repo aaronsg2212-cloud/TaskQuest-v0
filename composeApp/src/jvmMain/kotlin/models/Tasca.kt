@@ -12,4 +12,15 @@ abstract class Tasca (val id: String, val titol: String, val dificultat: Int, va
 //calcula l'experiencia guanyada depenent de la dificultat de la tasca
     abstract fun calcularXP(): Int
 
+    //falta afegir el canvi al UML
+    companion object {
+        fun crear(tipus: String, id: String, titol: String, dificultat: Int, estadistica: String): Tasca? {
+            return when (tipus) {
+                "1" -> MissioNormal(id, titol, dificultat, estadistica)
+                "2" -> MissioDiaria(id, titol, dificultat, estadistica)
+                "3" -> MissioEspecial(id, titol, dificultat, estadistica)
+                else -> null
+            }
+        }
+    }
 }

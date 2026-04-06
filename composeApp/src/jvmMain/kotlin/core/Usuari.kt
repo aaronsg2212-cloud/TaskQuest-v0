@@ -2,6 +2,8 @@ package core
 
 import models.Tasca
 import models.Estadistica
+import models.IdDuplicatException
+import models.EstadisticaNoExisteixException
 
 class Usuari (val id: String, val nom: String){
     //nivell i xp definida per defecte a l'usuari
@@ -11,16 +13,33 @@ class Usuari (val id: String, val nom: String){
     val tasques = mutableListOf<Tasca>()
     //lista de estadistiques predefinides. NOTA: Es podria canviar per a que l'usuari pugui afegir estadistiques
     val estadistiques: MutableList<Estadistica> = mutableListOf(
-        Estadistica("Força"),
-        Estadistica("Intel·ligència"),
-        Estadistica("Creativitat"),
-        Estadistica("Disciplina"),
-        Estadistica("Salut")
+        Estadistica("força"),
+        Estadistica("intel·ligencia"),
+        Estadistica("creativitat"),
+        Estadistica("disciplina"),
+        Estadistica("salut")
 
     )
-    //funcio afegur tasques.
-    fun afegirTasca(tasca:Tasca){
-        tasques.add(tasca)
+    //funcio afegir tasques.
+    fun afegirTasca(tasca: Tasca) {
+        require(tasca.id.isNotEmpty()) { "L'ID no pot estar buit" }
+        require(tasca.dificultat in 1..10) { "La dificultat ha de ser entre 1 i 10" }
+        try {
+            if (tasques.any { it.id == tasca.id }) {
+                throw IdDuplicatException("Ja existeix una tasca amb aquest ID.")
+            } else {
+                tasques.add(tasca)
+                assert(tasques.contains(tasca)) { "La tasca no s'ha afegit correctament" }
+                println("Tasca afegida!")
+            }
+            if (estadistiques.none { it.nom.lowercase() == tasca.estadisticaAfectada.lowercase() }) {
+                throw EstadisticaNoExisteixException("L'estadística no existeix.")
+            }
+        } catch (e: IdDuplicatException) {
+            println(e.message)
+        } catch (e: EstadisticaNoExisteixException) {
+            println(e.message)
+        }
     }
     //funcio per a compeltar la tasca.
     //agafa l'ID del main i comprova si esta a la llista
@@ -61,4 +80,21 @@ class Usuari (val id: String, val nom: String){
         }
         println("xp actual: $xp / ${nivell*100}")
     }
+
+    //filtrar les tasques per dificultat amb rangs per a facilitar la búsqueda.
+    fun filtrarPerDificultat(rang: String){
+        val resultat = when (rang) {
+            "1" -> tasques.filter { it.dificultat in 1..3 }
+            "2" -> tasques.filter { it.dificultat in 4..6 }
+            "3" -> tasques.filter { it.dificultat in 7..10 }
+            else -> emptyList()
+        }
+        if (resultat.isEmpty()) {
+            println("No hi ha tasques amb aquesta dificultat.")
+        } else {
+            resultat.forEach { println("${it.id} - ${it.titol} [Dificultat: ${it.dificultat}]") }
+        }
+
+    }
+
 }
