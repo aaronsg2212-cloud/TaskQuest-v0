@@ -17,6 +17,8 @@ fun main() {
 
 fun menuPrincipal(gestor: GestorUsuaris) {
     println("\n=== TASKQUEST ===")
+    println("===REPOSITORY GIT===")
+    println("https://github.com/aaronsg2212-cloud/TaskQuest-v0")
     println("1. Crear usuari")
     println("2. Iniciar sessió")
     println("3. Sortir")
