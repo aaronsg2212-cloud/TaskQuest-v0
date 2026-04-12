@@ -2,6 +2,7 @@ package app
 import models.*
 import core.Usuari
 import utils.Utils
+import viewmodel.UsuariViewModel
 
 fun main() {
     val gestor = GestorUsuaris()
@@ -49,10 +50,10 @@ fun menuUsuari(gestor: GestorUsuaris) {
     print("Escull una opció: ")
 
     when (readLine()) {
-        "1" -> afegirTasca(usuari)
-        "2" -> completarTasca(usuari)
+        "1" -> afegirTasca(gestor)
+        "2" -> completarTasca(gestor)
         "3" -> Utils.mostrarTasques(usuari)
-        "4" -> eliminarTasca(usuari)
+        "4" -> eliminarTasca(gestor)
         "5" -> gestor.eliminarUsuari()
         "6" -> gestor.canviarUsuari()
         "7" -> filtrarTasques(usuari)
@@ -65,12 +66,10 @@ fun menuUsuari(gestor: GestorUsuaris) {
 }
 
 fun crearUsuari(gestor: GestorUsuaris) {
-//funcions a utils pera demanar els ids i els noms per a evitar redundancia de codi
     println("ID usuari:")
     val id = Utils.demanarId()
     println("Nom usuari:")
     val nom = Utils.demanarINoms()
-
     gestor.crearUsuari(id, nom)
 }
 
@@ -83,7 +82,8 @@ fun iniciarSessio(gestor: GestorUsuaris) {
     gestor.iniciarSessio(id, nom)
 }
 
-fun afegirTasca(usuari: Usuari) {
+fun afegirTasca(gestor: GestorUsuaris) {
+    val usuari = gestor.usuariActual!!
     println("\nTipus de tasca:")
     println("1. Normal")
     println("2. Diària")
@@ -101,7 +101,7 @@ fun afegirTasca(usuari: Usuari) {
         print("Dificultat (1-10): ")
         dificultat = readLine()!!.toInt()
         if (dificultat !in 1..10) println("La dificultat no pot ser mes gran que 10 ni menor que 1")
-    }while (dificultat !in 1..10)
+    } while (dificultat !in 1..10)
 
     println("Estadístiques disponibles: ${usuari.estadistiques.map { it.nom }.joinToString(", ")}")
     print("Estadística afectada: ")
@@ -111,12 +111,14 @@ fun afegirTasca(usuari: Usuari) {
 
     if (tasca != null) {
         usuari.afegirTasca(tasca)
+        gestor.actualitzarUsuari(usuari)
     } else {
         println("Tipus no vàlid.")
     }
 }
 
-fun completarTasca(usuari: Usuari) {
+fun completarTasca(gestor: GestorUsuaris) {
+    val usuari = gestor.usuariActual!!
     if (usuari.tasques.isEmpty()) {
         println("No tens tasques.")
         return
@@ -125,9 +127,11 @@ fun completarTasca(usuari: Usuari) {
     print("ID de la tasca: ")
     val id = Utils.demanarId()
     usuari.completarTasca(id)
+    gestor.actualitzarUsuari(usuari)
 }
 
-fun eliminarTasca(usuari: Usuari) {
+fun eliminarTasca(gestor: GestorUsuaris) {
+    val usuari = gestor.usuariActual!!
     if (usuari.tasques.isEmpty()) {
         println("No tens tasques.")
         return
@@ -136,8 +140,8 @@ fun eliminarTasca(usuari: Usuari) {
     print("ID de la tasca a eliminar: ")
     val id = Utils.demanarId()
     usuari.eliminarTasca(id)
+    gestor.actualitzarUsuari(usuari)
 }
-//funició per a fultrar tasques per dificultat mitjançant rangs.
 
 fun filtrarTasques(usuari: Usuari) {
     println("\n1. Fàcil (1-3)")

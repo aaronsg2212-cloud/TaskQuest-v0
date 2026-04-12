@@ -1,5 +1,8 @@
 package models
-
+import kotlinx.serialization.Serializable
+@Serializable
+//per a implementar el serializer amb herencia he decidit cambia la clase abstract per sealed el canvi es que amb sealed les herencies han d'estar al mateix arxiu
+//aquest canvi m'ajudara a facilitar la persistencia de dades
 abstract class Tasca (val id: String, val titol: String, val dificultat: Int, val estadisticaAfectada: String) {
     var completada: Boolean = false
 //marca la tasca com completada i crida a calcularXP.
