@@ -8,6 +8,12 @@ import java.time.LocalDate
 import core.Usuari
 import models.Tasca
 
+// he optat per un JsonRepository específic per a Usuari en lloc de genèric
+// per poder accedir directament a usuari.id en el mètode delete()
+// La genericitat de Repository<T> es manté a nivell d'interfície.
+// JsonRepository implementa Repository<Usuari> per gestionar la jerarquia
+// d'herència de Tasca, que requeria un TypeAdapter personalitzat de Gson.
+
 class JsonRepository(
     private val fileName: String
 ) : Repository<Usuari> {
@@ -37,7 +43,8 @@ class JsonRepository(
             println("Error al guardar el fitxer: ${e.message}")
         }
     }
-
+    // Typetoken: serveix per dir-li a Gson quin tipus de llista ha d'esperar
+// sense TypeToken, Gson no sabria si la llista és List<Usuari> o List<String>
     override fun findAll(): List<Usuari> {
         return try {
             if (!file.exists()) return emptyList()
